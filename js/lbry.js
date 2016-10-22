@@ -19,7 +19,7 @@ lbry.jsonrpc_call = function (connectionString, method, params, callback, errorC
       if (errorCallback) {
         errorCallback(response.error);
       } else {
-        var errorEvent = new CustomEvent('unhandledRPCError', {
+        var errorEvent = new CustomEvent('unhandledError', {
           detail: {
             connectionString: connectionString,
             method: method,
@@ -37,8 +37,21 @@ lbry.jsonrpc_call = function (connectionString, method, params, callback, errorC
   });
 
   if (connectFailedCallback) {
-    xhr.addEventListener('error', function (e) {
-      connectFailedCallback(e);
+    xhr.addEventListener('error', function (event) {
+      connectFailedCallback(event);
+    });
+  } else {
+    xhr.addEventListener('error', function (event) {
+      var errorEvent = new CustomEvent('unhandledError', {
+        detail: {
+          connectionString: connectionString,
+          method: method,
+          params: params,
+          code: xhr.status,
+          message: 'Connection to API server failed'
+        }
+      });
+      document.dispatchEvent(errorEvent);
     });
   }
 
