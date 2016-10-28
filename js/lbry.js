@@ -324,6 +324,25 @@ lbry.formatName = function(name) {
   return name.toLowerCase().replace(/[^a-z0-9\-]/g, '');
 }
 
+lbry.parseUri = function(uri) {
+  // Takes a LBRY URI (vanity name or fully resolved), with or without lbry:// prefix.
+  // Returns an object containing a 'name' key with the unresolved name, and a 'txid' key
+  // with the txid (if present)
+
+  let [_, unresolved_name, txid] = uri.match(/^(?:lbry:\/\/)?([a-z0-9\-]+)(?:\/([a-z0-9]+))?$/);
+
+  let results = {name: unresolved_name};
+  if (txid) {
+    results.txid = txid;
+  }
+
+  return results;
+}
+lbry.buildUri = function(name, txid=null, includePrefix=false) {
+  const prefix = includePrefix ? 'lbry://' : '';
+  return prefix + (txid !== null ? (name + `/{$txid}`) : name);
+}
+
 lbry.loadJs = function(src, type, onload)
 {
   var lbryScriptTag = document.getElementById('lbry'),
