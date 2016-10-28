@@ -257,7 +257,7 @@ var DiscoverPage = React.createClass({
       query: this.props.query,
     });
 
-    lbry.search(this.props.query, this.searchCallback);
+    lbry.lighthouse.search(this.props.query, this.searchCallback, true);
   },
 
   componentDidMount: function() {
