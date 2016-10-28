@@ -85,3 +85,18 @@ lbry.lighthouse.getClaimInfo = function(uri, callback, includeChannel=false) {
     callback(results[0]);
   }, includeChannel);
 };
+
+lbry.lighthouse.getStreamsForChannel = function(uri, callback) {
+  /*** Placeholder for Lighthouse method ***/
+  if (uri == 'oscilloscope/9777bf01b16f144d7b51e5618ca41bf6a73f62af38348c3ad826f8276d1199ff') {
+    callback([
+      'itsadisaster/9dace2d09993444d7b51e5618ca4350bba49771638348c3ad826f8276d1199ff',
+      'bellflower/19e0da1e438ecfcbc1c69777bf01b16f142d47cbfc821bf6a73f62affd692071',
+    ]);
+  } else {
+    callback([
+      'what/cbfc821bf6a73f62affd69207119e0da1e438ecfcbc1c69777bf01b16f142d47',
+      'superman1940-e4/93cca310be0efbec54a02fddda59a84d588a8dde0ca422a7529bae1711bbf5eb',
+    ]);
+  }
+};
