@@ -48,3 +48,40 @@ lbry.lighthouse.search = function(query, callback, includeChannels=false)
     }
   });
 };
+
+lbry.lighthouse.getClaimInfo = function(uri, callback, includeChannel=false) {
+  /**** Dummy code until channel claims are implemented ****/
+  if (uri == 'oscilloscope/9777bf01b16f144d7b51e5618ca41bf6a73f62af38348c3ad826f8276d1199ff') {
+    callback({
+      'name': 'oscilloscope',
+      'amount': 1,
+      'value': {
+        'ver': '0.0.1',
+        'type': 'channel',
+        'title': 'Oscilloscope Laboratories',
+        'description': 'OSCILLOSCOPE LABORATORIES has three divisions. It is like a three-headed dragon. The brains of the three heads are designed to think uniquely. While O-SCOPE PICTURES is thinking about distributing films, O-SCOPE PRODUCTIONS is thinking about making films, and the third head is mostly thinking about making music.',
+        'thumbnail': 'http://i.imgur.com/UHN3plu.jpg',
+      },
+    });
+    return;
+  } else if (uri == 'lbry/4d7f69701b16f142af38348c3a6f8276d1199ffsdb51e56177bf8ca41bf6a7382') {
+    callback({
+      'name': 'lbry',
+      'amount': 1,
+      'value': {
+        'ver': '0.0.1',
+        'type': 'channel',
+        'title': 'LBRY',
+        'description': 'Official content from the LBRY team.',
+        'thumbnail': 'https://s3.amazonaws.com/files.lbry.io/logo.png',
+      },
+    });
+    return;
+  }
+  /**** End dummy code ****/
+
+  // There will eventually be a special Lighthouse method for this
+  return lbry.lighthouse.search(lbry.parseUri(uri).name, function(results) {
+    callback(results[0]);
+  }, includeChannel);
+};
