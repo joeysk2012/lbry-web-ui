@@ -234,6 +234,19 @@ input[type="text"], input[type="search"]
   }
 }
 
+.search-result-row__header {
+  margin-bottom: 12px;
+  min-height: 40px;
+}
+
+#main-content h3.search-result-row__title {
+  margin-bottom: 0px;
+}
+
+.search-result-row__channel {
+  font-size: 0.8em;
+}
+
 .channel-page__info {
   display: flex;
 }

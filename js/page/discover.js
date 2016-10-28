@@ -36,12 +36,12 @@ var SearchResults = React.createClass({
   render: function() {
     var rows = [];
     this.props.results.forEach(function(result) {
-      console.log(result);
-      var mediaType = lbry.getMediaType(result.value.content_type);
+      let {name, cost, available, channel_metadata, value: {title, description, channel, content_type, thumbnail, nsfw}} = result;
+      let channelProps = channel ? {channelName: channel, channelTitle: channel_metadata.title} : {};
       rows.push(
-        <SearchResultRow key={result.name} name={result.name} title={result.value.title} imgUrl={result.value.thumbnail}
-                         description={result.value.description} cost={result.cost} nsfw={result.value.nsfw}
-                         mediaType={mediaType}  />
+        <SearchResultRow key={name} name={name} title={title} imgUrl={thumbnail} description={description}
+                         cost={cost} nsfw={result.value.nsfw} mediaType={lbry.getMediaType(content_type)}
+                         available={available} {... channelProps} />
       );
     });
     return (
@@ -120,13 +120,20 @@ var SearchResultRow = React.createClass({
               <CreditAmount amount={this.props.cost} isEstimate={!this.props.available}/>
             </span>
             <div className="meta"><a href={'/?show=' + this.props.name}>lbry://{this.props.name}</a></div>
-            <h3 style={titleStyle}>
-              <a href={'/?show=' + this.props.name}>
-                <TruncatedText lines={3}>
-                  {this.props.title}
-                </TruncatedText>
-              </a>
-            </h3>
+            <div className='search-result-row__header'>
+              <h3 className="search-result-row__title" style={titleStyle}>
+                <a href={'/?show=' + this.props.name}>
+                  <TruncatedText lines={3}>
+                    {this.props.title}
+                  </TruncatedText>
+                </a>
+              </h3>
+            {this.props.channelName
+              ? <div className="search-result-row__channel">
+                  by <Link href={`?channel=${this.props.channelName}`} label={this.props.channelTitle} />
+                </div>
+              : null }
+            </div>
             <div>
               {this.props.mediaType == 'video' ? <WatchLink streamName={this.props.name} button="primary" /> : null}
               <DownloadLink streamName={this.props.name} button="text" />
@@ -165,9 +172,7 @@ var FeaturedContentItem = React.createClass({
 
   getInitialState: function() {
     return {
-      metadata: null,
-      title: null,
-      amount: 0.0,
+      claimInfo: null,
       overlayShowing: false,
     };
   },
@@ -179,32 +184,32 @@ var FeaturedContentItem = React.createClass({
   componentDidMount: function() {
     this.resolveSearch = true;
 
-    lbry.search(this.props.name, function(results) {
-      var result = results[0];
-      var metadata = result.value;
+    lbry.lighthouse.getClaimInfo(this.props.name, (result) => {
       if (this.resolveSearch)
       {
         this.setState({
-          metadata: metadata,
-          amount: result.cost,
-          available: result.available,
-          title: metadata && metadata.title ? metadata.title : ('lbry://' + this.props.name),
+          claimInfo: result,
         });
       }
-    }.bind(this));
+    }, true);
   },
 
   render: function() {
-    if (this.state.metadata === null) {
+    if (this.state.claimInfo === null) {
       // Still waiting for metadata, skip render
       return null;
     }
 
-    return (<div style={featuredContentItemContainerStyle}>
-      <SearchResultRow name={this.props.name} title={this.state.title} imgUrl={this.state.metadata.thumbnail || '/img/default-thumb.svg'}
-                 description={this.state.metadata.description} mediaType={lbry.getMediaType(this.state.metadata.content_type)}
-                 cost={this.state.amount} nsfw={this.state.metadata.nsfw} available={this.state.available} compact />
-    </div>);
+    let {cost, available, channel_metadata, value: {title, description, channel, content_type, thumbnail, nsfw}} = this.state.claimInfo;
+
+    let channelProps = channel ? {channelName: channel, channelTitle: channel_metadata.title} : {};
+    return (
+      <div style={featuredContentItemContainerStyle}>
+        <SearchResultRow name={this.props.name} title={title} imgUrl={thumbnail || '/img/default-thumb.svg'}
+                         description={description}  mediaType={lbry.getMediaType(content_type)}
+                         cost={cost} nsfw={nsfw} available={available} compact {... channelProps} />
+      </div>
+    );
   }
 });
 
