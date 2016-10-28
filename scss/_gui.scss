@@ -234,6 +234,24 @@ input[type="text"], input[type="search"]
   }
 }
 
+.channel-page__info {
+  display: flex;
+}
+
+.channel-page__thumbnail {
+  max-width: 146px;
+  max-height: 146px;
+  margin-right: 10px;
+  padding-bottom: 10px;
+}
+
+.channel-page__description {
+  width: 630px;
+}
+
+.channel-page .card {
+  max-width: none;
+}
 
 .modal-overlay {
   position: fixed;

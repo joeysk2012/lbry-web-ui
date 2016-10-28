@@ -175,6 +175,8 @@ var App = React.createClass({
         return <DetailPage name={this.state.pageArgs} />;
       case 'publish':
         return <PublishPage />;
+      case 'channel':
+        return <ChannelPage name={this.state.pageArgs} />;
       case 'discover':
       default:
         return <DiscoverPage query={this.state.pageArgs} />;
