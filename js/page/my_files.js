@@ -2,7 +2,6 @@ import React from 'react';
 import lbry from '../lbry.js';
 import {Link, WatchLink} from '../component/link.js';
 import {Menu, MenuItem} from '../component/menu.js';
-import FormField from '../component/form.js';
 import Modal from '../component/modal.js';
 import {BusyMessage, Thumbnail} from '../component/common.js';
 
@@ -169,31 +168,12 @@ var MyFilesPage = React.createClass({
   _fileTimeout: null,
   _fileInfoCheckRate: 300,
   _fileInfoCheckNum: 0,
-  _sortFunctions: {
-    date: function(filesInfo) {
-      return filesInfo.reverse();
-    },
-    title: function(filesInfo) {
-      return filesInfo.sort(function(a, b) {
-        console.log('in title sort. a is', a, '; b is', b)
-        return ((a.metadata ? a.metadata.title.toLowerCase() : a.name) >
-                (b.metadata ? b.metadata.title.toLowerCase() : b.name));
-      });
-    },
-    filename: function(filesInfo) {
-      return filesInfo.sort(function(a, b) {
-        return (a.file_name.toLowerCase() >
-                b.file_name.toLowerCase());
-      });
-    },
-  },
 
   getInitialState: function() {
     return {
       filesInfo: null,
       publishedFilesSdHashes: null,
       filesAvailable: {},
-      sortBy: 'date',
     };
   },
   getDefaultProps: function() {
@@ -236,17 +216,6 @@ var MyFilesPage = React.createClass({
       clearTimeout(this._fileTimeout);
     }
   },
-  setFilesInfo: function(filesInfo) {
-    this.setState({
-      filesInfo: this._sortFunctions[this.state.sortBy](filesInfo),
-    });
-  },
-  handleSortChanged: function(event) {
-    this.setState({
-      sortBy: event.target.value,
-      filesInfo: this._sortFunctions[event.target.value](this.state.filesInfo),
-    });
-  },
   updateFilesInfo: function() {
     this._fileInfoCheckNum += 1;
 
@@ -263,7 +232,9 @@ var MyFilesPage = React.createClass({
               newFilesInfo.push(fileInfo);
             }
             if (claimInfoProcessedCount >= claimsInfo.length) {
-              this.setFilesInfo(newFilesInfo);
+              this.setState({
+                filesInfo: newFilesInfo
+              });
 
               this._fileTimeout = setTimeout(() => { this.updateFilesInfo() }, 1000);
             }
@@ -274,9 +245,11 @@ var MyFilesPage = React.createClass({
       // We're in the Downloaded tab, so populate this.state.filesInfo with files the user has in
       // lbrynet, with published files filtered out.
       lbry.getFilesInfo((filesInfo) => {
-        this.setFilesInfo(filesInfo.filter(({sd_hash}) => {
-          return this.state.publishedFilesSdHashes.indexOf(sd_hash) == -1;
-        }));
+        this.setState({
+          filesInfo: filesInfo.filter(({sd_hash}) => {
+            return this.state.publishedFilesSdHashes.indexOf(sd_hash) == -1;
+          }),
+        });
 
         let newFilesAvailable;
         if (!(this._fileInfoCheckNum % this._fileInfoCheckRate)) {
@@ -354,14 +327,6 @@ var MyFilesPage = React.createClass({
     }
     return (
       <main className="page">
-        <span className='sort-section'>
-          Sort by { ' ' }
-          <FormField type="select" onChange={this.handleSortChanged}>
-            <option value="date">Date</option>
-            <option value="title">Title</option>
-            <option value="filename">File name</option>
-          </FormField>
-        </span>
         {content}
       </main>
     );
